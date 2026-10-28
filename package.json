@@ -19,6 +19,7 @@
     "local:redis": "yarn workspace localMode redis",
     "local:start": "./localMode/bin/start-all.js",
     "seeds": "tsx -r dotenv/config ./seeds/index.ts",
+    "agent:local": "tsx -r dotenv/config ./scripts/annotatorAgent/runLocal.ts",
     "migration:generate": "./bin/generateMigration.js",
     "typecheck": "react-router typegen && tsc",
     "format": "prettier --write .",

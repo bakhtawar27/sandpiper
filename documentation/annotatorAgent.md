@@ -11,7 +11,7 @@ isPublished: false
 
 The **Annotator Agent** takes a codebook document and a project's sessions and starts an annotation run, with no manual prompt writing. One request does four steps:
 
-1. **Import the codebook.** The document (PDF, DOCX, TXT, MD, CSV or JSON) is read and an LLM extracts its categories, codes, definitions and examples into a new **Codebook** (version 1, marked production). Speaker rules ("student turns only") and conditional rules ("only code correctness when the student gives an answer") are kept in each category's description.
+1. **Import the codebook.** The document (PDF, DOCX, TXT, MD, CSV or JSON) is read and an LLM extracts its categories, codes, definitions and examples into a new **Codebook** (version 1, marked production). Speaker rules ("student turns only") and conditional rules ("only code correctness when the student gives an answer") are kept in each category's description, and those categories get an `NA` code.
 2. **Generate the prompt.** The existing codebook → prompt generator writes the annotation prompt and builds the **Schema**: one field per category, its codes as allowed values.
 3. **Check credits.** Sessions are selected, the cost is estimated, and the request stops if the team balance is too low. The codebook and prompt are kept, so a run can be started later.
 4. **Start the run.** A normal **Run** is created and started, so progress, results, exports, **Run Sets** and **Evaluations** work as usual.
@@ -19,6 +19,31 @@ The **Annotator Agent** takes a codebook document and a project's sessions and s
 You can also use an existing codebook (`codebookId`) and skip step 1.
 
 ## How to use
+
+### Try it locally without the full app
+
+`yarn agent:local` runs the same code with only the AI keys in `.env` (`LLM_PROVIDER` and the AI Gateway or OpenAI keys). It needs no database, login, Redis or workers.
+
+```bash
+yarn agent:local --codebook ~/Desktop/Steps/STEPS-Final-Codebook.pdf
+# review tmp/annotator-agent/codebook.md and prompt.md, then:
+yarn agent:local --codebook-json tmp/annotator-agent/codebook.json \
+  --prompt tmp/annotator-agent/prompt.md \
+  --data ~/Desktop/Steps/Unannotated_Dataset.csv --sessions 2
+```
+
+| Option            | Meaning                                                                           |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `--codebook`      | Codebook document to read (step 1)                                                |
+| `--codebook-json` | Reuse a reviewed or edited `codebook.json` instead                                |
+| `--prompt`        | Reuse a reviewed or edited `prompt.md` instead of generating one                  |
+| `--data`          | CSV with session, speaker/role and text/content columns; S/T become Student/Tutor |
+| `--sessions`      | How many sessions to annotate (default 2)                                         |
+| `--model`         | Model code (default `nto.gemini-2.5-flash`)                                       |
+| `--out`           | Output folder (default `tmp/annotator-agent`)                                     |
+| `--yes`           | Skip the "annotate now?" question                                                 |
+
+Output: `codebook.json`, `codebook.md`, `prompt.md`, `schema.json` and `annotated.csv` (your rows plus `ai_<field>` and `ai_reasoning` columns). Categories that apply to one speaker, or only under a condition, get an `NA` code automatically.
 
 ### Import a codebook from a file (UI)
 

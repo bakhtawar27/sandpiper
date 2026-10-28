@@ -48,6 +48,8 @@ export interface NormalizedCodebook {
 
 const MAX_TEXT_LENGTH = 4000;
 
+export const NOT_APPLICABLE_CODE = "NA";
+
 function toCleanString(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.replace(/\s+/g, " ").trim().slice(0, MAX_TEXT_LENGTH);
@@ -66,6 +68,24 @@ function toExampleType(value: unknown): ExampleType {
     : "HIT";
 }
 
+function isScopedToSpeaker(speaker: string): boolean {
+  return !!speaker && !/^(all|any|both|everyone)$/i.test(speaker);
+}
+
+/**
+ * True when a category is only coded for some utterances (one speaker, or a
+ * condition on another category). Every annotation must fill every field, so
+ * such categories get an NA code for the other utterances.
+ */
+export function needsNotApplicableCode(
+  category: ExtractedCodebookCategory,
+): boolean {
+  return (
+    isScopedToSpeaker(toCleanString(category.appliesToSpeaker)) ||
+    !!toCleanString(category.condition)
+  );
+}
+
 /**
  * Folds speaker scoping and conditional rules into the category description,
  * so the existing codebook → prompt generator passes them to the LLM without
@@ -80,14 +100,14 @@ export function buildCategoryDescription(
   const condition = toCleanString(category.condition);
 
   if (description) parts.push(description);
-  if (speaker && !/^(all|any|both|everyone)$/i.test(speaker)) {
+  if (isScopedToSpeaker(speaker)) {
     parts.push(
-      `Applies to: ${speaker} utterances only. Leave this field empty for other speakers.`,
+      `Applies to: ${speaker} utterances only. Use ${NOT_APPLICABLE_CODE} for other speakers.`,
     );
   }
   if (condition) {
     parts.push(
-      `Only code this when: ${condition}. Otherwise leave this field empty.`,
+      `Only code this when: ${condition}. Otherwise use ${NOT_APPLICABLE_CODE}.`,
     );
   }
 
@@ -97,7 +117,8 @@ export function buildCategoryDescription(
 /**
  * Cleans the raw JSON an LLM returns when reading a codebook document:
  * trims text, drops empty categories/codes/examples, removes duplicate codes
- * (case-insensitive) and maps unknown example types to HIT.
+ * (case-insensitive), maps unknown example types to HIT and adds an NA code
+ * to speaker-scoped or conditional categories.
  */
 export default function normalizeExtractedCodebook(
   raw: ExtractedCodebook,
@@ -140,6 +161,19 @@ export default function normalizeExtractedCodebook(
 
     if (codes.length === 0) continue;
     usedCategoryNames.add(name.toLowerCase());
+
+    if (
+      needsNotApplicableCode(category) &&
+      !usedCodes.has(NOT_APPLICABLE_CODE.toLowerCase())
+    ) {
+      codes.push({
+        code: NOT_APPLICABLE_CODE,
+        description: "",
+        definition:
+          "Not applicable: this utterance is outside the speaker or condition this category applies to.",
+        examples: [],
+      });
+    }
 
     categories.push({
       name,

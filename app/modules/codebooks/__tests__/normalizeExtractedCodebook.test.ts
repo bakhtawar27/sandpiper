@@ -31,6 +31,10 @@ describe("normalizeExtractedCodebook", () => {
     expect(result.name).toBe("STEPS codebook");
     expect(result.intention).toBe("Codes student and tutor moves");
     expect(result.categories).toHaveLength(1);
+    expect(result.categories[0].codes.map((c) => c.code)).toEqual([
+      "General help-seeking",
+      "NA",
+    ]);
     expect(result.categories[0].codes[0]).toEqual({
       code: "General help-seeking",
       description: "",
@@ -104,9 +108,11 @@ describe("buildCategoryDescription", () => {
     });
 
     expect(description).toContain("Is the student's answer correct?");
-    expect(description).toContain("Applies to: Student utterances only.");
     expect(description).toContain(
-      "Only code this when: student input type is Direct answer or Answer with uncertainty.",
+      "Applies to: Student utterances only. Use NA for other speakers.",
+    );
+    expect(description).toContain(
+      "Only code this when: student input type is Direct answer or Answer with uncertainty. Otherwise use NA.",
     );
   });
 
@@ -114,5 +120,30 @@ describe("buildCategoryDescription", () => {
     expect(
       buildCategoryDescription({ description: "x", appliesToSpeaker: "All" }),
     ).toBe("x");
+  });
+});
+
+describe("NA code", () => {
+  it("is added once for conditional categories and not for general ones", () => {
+    const result = normalizeExtractedCodebook({
+      categories: [
+        {
+          name: "Correctness",
+          condition: "the student gives an answer",
+          codes: [{ code: "Correct" }, { code: "na" }],
+        },
+        {
+          name: "Tutor move",
+          appliesToSpeaker: "All",
+          codes: [{ code: "Hint" }],
+        },
+      ],
+    });
+
+    expect(result.categories[0].codes.map((c) => c.code)).toEqual([
+      "Correct",
+      "na",
+    ]);
+    expect(result.categories[1].codes.map((c) => c.code)).toEqual(["Hint"]);
   });
 });
