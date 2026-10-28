@@ -24,6 +24,7 @@ import {
   codebookUrl,
 } from "~/modules/codebooks/helpers/codebookUrls";
 import { useCodebookActions } from "~/modules/codebooks/hooks/useCodebookActions";
+import { useImportCodebook } from "~/modules/codebooks/hooks/useImportCodebook";
 import addDialog from "~/modules/dialogs/addDialog";
 import TeamAuthorization from "../authorization";
 import TeamCodebooks from "../components/teamCodebooks";
@@ -124,6 +125,9 @@ export default function TeamCodebooksRoute() {
 
   const { openEditCodebookDialog, openDeleteCodebookDialog } =
     useCodebookActions();
+  const { openImportCodebookDialog } = useImportCodebook({
+    teamId: teamId!,
+  });
 
   const {
     searchValue,
@@ -192,6 +196,9 @@ export default function TeamCodebooksRoute() {
   const onActionClicked = (action: string) => {
     if (action === "CREATE") {
       onCreateCodebookButtonClicked();
+    }
+    if (action === "IMPORT") {
+      openImportCodebookDialog();
     }
   };
 

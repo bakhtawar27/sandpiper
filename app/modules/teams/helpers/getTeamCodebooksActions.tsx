@@ -11,6 +11,10 @@ export default function getTeamCodebooksActions(
         action: "CREATE",
         text: "Create codebook",
       },
+      {
+        action: "IMPORT",
+        text: "Import from file",
+      },
     ];
   } else {
     return [];

@@ -11,6 +11,7 @@ const SOURCE_CATEGORIES: Record<LlmCostSource, CostCategory> = {
   "adjudication:per-utterance": "user-initiated",
   "file-conversion": "system",
   "codebook-prompt-generation": "system",
+  "codebook-document-import": "system",
   "attribute-mapping": "system",
   "prompt-alignment": "system",
 };

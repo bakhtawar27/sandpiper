@@ -23,6 +23,15 @@ A key feature of codebooks is the ability to **auto-generate Prompts** directly 
 2.  **Create a Codebook:** Click **"Create codebook"** and fill in the **Name** and **Intention** fields (the Intention describes what this codebook is for).
 3.  **Open the Editor:** The codebook editor opens with an initial version ready for your categories and codes.
 
+### Importing a Codebook from a File
+
+1.  **Click "Import from file"** on the Codebooks page.
+2.  **Choose your document:** PDF, DOCX, TXT, MD, CSV or JSON, up to 10 MB.
+3.  **Wait for the import:** Sandpiper reads the document and uses an LLM to create the categories, codes, definitions and examples.
+4.  **Review in the editor:** Check every code before generating a prompt. Rules such as "student turns only" are added to the category description.
+
+See **[Annotator Agent](annotatorAgent)** to import a codebook and start a run in one request.
+
 ### Defining Categories and Codes
 
 In the codebook editor:

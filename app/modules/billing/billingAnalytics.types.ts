@@ -5,6 +5,7 @@ export type LlmCostSource =
   | "verification:per-utterance"
   | "file-conversion"
   | "codebook-prompt-generation"
+  | "codebook-document-import"
   | "attribute-mapping"
   | "prompt-alignment"
   | "adjudication:per-utterance"

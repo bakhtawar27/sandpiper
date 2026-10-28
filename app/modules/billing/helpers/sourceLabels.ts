@@ -10,6 +10,7 @@ const SOURCE_LABELS: Record<LlmCostSource, string> = {
   "verification:per-utterance": "Verification",
   "file-conversion": "File Conversion",
   "codebook-prompt-generation": "Codebook Generation",
+  "codebook-document-import": "Codebook Import",
   "attribute-mapping": "Attribute Mapping",
   "prompt-alignment": "Prompt Alignment",
   "adjudication:per-utterance": "Adjudication",

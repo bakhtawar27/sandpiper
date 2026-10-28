@@ -5,6 +5,7 @@ import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annota
 import type { FindOptions, PaginateProps } from "~/modules/common/types";
 import type { Codebook } from "./codebooks.types";
 import createPromptFromCodebook from "./services/createPromptFromCodebook.server";
+import importCodebookFromDocument from "./services/importCodebookFromDocument.server";
 
 const CodebookModel =
   mongoose.models.Codebook || mongoose.model("Codebook", codebookSchema);
@@ -106,5 +107,15 @@ export class CodebookService {
     teamId: string;
   }) {
     return createPromptFromCodebook(options);
+  }
+
+  static async importFromDocument(options: {
+    fileName: string;
+    buffer: ArrayBuffer;
+    name?: string;
+    teamId: string;
+    userId: string;
+  }) {
+    return importCodebookFromDocument(options);
   }
 }

@@ -218,6 +218,10 @@ export default [
     "modules/billing/containers/estimateCost.route.tsx",
   ),
   route(
+    "api/annotatorAgent",
+    "modules/annotatorAgent/containers/annotatorAgent.route.tsx",
+  ),
+  route(
     "api/webhooks/stripe",
     "modules/billing/containers/stripeWebhook.route.tsx",
   ),
